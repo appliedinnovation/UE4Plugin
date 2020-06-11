@@ -741,8 +741,8 @@ void FNoesisRenderDevice::DrawBatch(const Noesis::Batch& Batch)
 	FNoesisVSBase* VertexShader = VertexShaders[ShaderCode];
 	FNoesisPSBase* PixelShader = PixelShaders[ShaderCode];
 	GraphicsPSOInit.BoundShaderState.VertexDeclarationRHI = VertexDeclaration;
-	GraphicsPSOInit.BoundShaderState.VertexShaderRHI = GETSAFERHISHADER_VERTEX(VertexShader);
-	GraphicsPSOInit.BoundShaderState.PixelShaderRHI = GETSAFERHISHADER_PIXEL(PixelShader);
+	GraphicsPSOInit.BoundShaderState.VertexShaderRHI = RHICmdList->GetBoundVertexShader(); // GETSAFERHISHADER_VERTEX(VertexShader);
+	GraphicsPSOInit.BoundShaderState.PixelShaderRHI = RHICmdList->GetBoundPixelShader(); //  GETSAFERHISHADER_PIXEL(PixelShader);
 	GraphicsPSOInit.PrimitiveType = PT_TriangleList;
 
 	SetGraphicsPipelineState(*RHICmdList, GraphicsPSOInit);

@@ -419,8 +419,8 @@ void NoesisPlaySoundCallback(void* UserData, const char* Filename, float Volume)
 
 	if (GEngine)
 	{
-		FAudioDevice* const AudioDevice = GEngine->GetActiveAudioDevice();
-		if (AudioDevice)
+		FAudioDeviceHandle AudioDevice = GEngine->GetActiveAudioDevice();
+		if (AudioDevice.IsValid())
 		{
 			FActiveSound NewActiveSound;
 			NewActiveSound.SetSound(Sound);

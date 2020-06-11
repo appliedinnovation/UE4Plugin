@@ -158,16 +158,16 @@ static UBlueprintFieldNodeSpawner* CreateSpawnerFromMemberOrParam(TSubclassOf<UK
 	// Post-Spawn Setup
 	//--------------------------------------
 
-	auto MemberVarSetupLambda = [](UEdGraphNode* NewNode, UField const* InField)
+	auto MemberVarSetupLambda = [](UEdGraphNode* NewNode, FFieldVariant InField) // UField const* InField)
 	{
-		if (UProperty const* Property = Cast<UProperty>(InField))
+		if (UProperty const* Property = InField.Get<UProperty>()) // Cast<UProperty>(InField))
 		{
 			UBlueprint* Blueprint = FBlueprintEditorUtils::FindBlueprintForNodeChecked(NewNode);
 			UClass* OwnerClass = Property->GetOwnerClass();
 
 			// We need to use a generated class instead of a skeleton class for IsChildOf, so if the OwnerClass has a Blueprint, grab the GeneratedClass
 			const bool bOwnerClassIsSelfContext = (Blueprint->SkeletonGeneratedClass->GetAuthoritativeClass() == OwnerClass) || Blueprint->SkeletonGeneratedClass->IsChildOf(OwnerClass);
-			const bool bIsFunctionVariable = Property->GetOuter()->IsA(UFunction::StaticClass());
+			const bool bIsFunctionVariable = Property->GetOwner<UObject>()->IsA(UFunction::StaticClass());
 
 			UK2Node_NoesisAssignAndNotify* VarNode = CastChecked<UK2Node_NoesisAssignAndNotify>(NewNode);
 			VarNode->SetFromProperty(Property, bOwnerClassIsSelfContext && !bIsFunctionVariable, OwnerClass);
@@ -251,7 +251,7 @@ void UK2Node_NoesisAssignAndNotify::GetMenuActions(FBlueprintActionDatabaseRegis
 			bool const bIsReadOnly = Property->HasAllPropertyFlags(CPF_BlueprintReadOnly);
 			bool IsPropertyBlueprintVisible = !Property->HasAnyPropertyFlags(CPF_Parm) && bIsAccessible && !bIsReadOnly;
 
-			if (IsPropertyBlueprintVisible && ActionRegistrar.IsOpenForRegistration(Property))
+			if (IsPropertyBlueprintVisible &&  ActionRegistrar.IsOpenForRegistration(Property->GetOwner<UObject>()))
 			{
 				UBlueprintNodeSpawner* SetterSpawner = CreateSpawnerFromMemberOrParam(UK2Node_NoesisAssignAndNotify::StaticClass(), Property);
 				ActionRegistrar.AddBlueprintAction(Blueprint, SetterSpawner);
